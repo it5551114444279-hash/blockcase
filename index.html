@@ -3,88 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#06111e">
   <title>BlockCase — кейсы в Minecraft</title>
-  <style>
-    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06111e;color:#fff;font-family:Arial,sans-serif}button{font:inherit;color:#fff;cursor:pointer}
-    #lobby{position:fixed;inset:0;display:grid;place-items:center;background:#06111e}
-    .stage{position:relative;width:min(100vw,calc(100vh * 1.77766));aspect-ratio:1673/941;background:url("lobby-empty.png") center/100% 100% no-repeat;box-shadow:0 0 70px #000}
-    .player-3d{position:absolute;z-index:2;left:39.2%;top:21%;width:20.5%;height:54%;cursor:grab;touch-action:none;filter:drop-shadow(0 16px 9px #08291b80)}
-    .player-3d:active{cursor:grabbing}.player-3d canvas{display:block;width:100%!important;height:100%!important}
-    .rotate-hint{position:absolute;z-index:3;left:42.5%;top:72.7%;width:14%;padding:.45% .4%;border-radius:20px;background:#071521c9;border:1px solid #7a9aae;color:#fff;text-align:center;font-size:clamp(7px,.68vw,12px);font-weight:800;pointer-events:none;opacity:.85}
-    .hotspot{position:absolute;border:0;background:transparent;color:transparent;border-radius:3px}
-    .hotspot:focus-visible,.hotspot:hover{outline:3px solid #6dff70;outline-offset:-3px;background:#56ff4212}
-    .h-play-menu{left:.65%;top:3%;width:8.8%;height:7.7%}.h-cases-menu{left:.65%;top:12%;width:8.8%;height:8.5%}.h-inv-menu{left:.65%;top:21.5%;width:8.8%;height:8.5%}.h-shop{left:.65%;top:31%;width:8.8%;height:8.5%}.h-bonus{left:.65%;top:40.5%;width:8.8%;height:8.5%}.h-leaders-menu{left:.65%;top:50%;width:8.8%;height:8.5%}.h-settings{left:.65%;top:60%;width:8.8%;height:9.5%}.h-chat{left:11.2%;top:79.2%;width:17.7%;height:7%}
-    .h-feature{left:72.1%;top:13.5%;width:26.5%;height:23.5%}.h-daily{left:72.1%;top:38.2%;width:26.5%;height:22%}.h-top{left:72.1%;top:63%;width:26.5%;height:13%}.h-play{left:72.1%;top:79.5%;width:26.5%;height:16%}
-    .money{position:absolute;z-index:3;top:5.25%;font-weight:900;text-shadow:2px 2px #000;font-size:clamp(10px,1.25vw,22px);pointer-events:none}.gems{left:78.3%}.coins{left:88.8%}
-    .screen{display:none;position:fixed;z-index:10;inset:0;background:radial-gradient(circle at 50% 30%,#16466e,#06111eef 55%,#02070c);padding:5vh 5vw;text-align:center;overflow:auto}.screen.show{display:block}
-    .back{position:absolute;left:25px;top:22px;padding:11px 18px;background:#173148;border:2px solid #5e8399;font-weight:900}.screen h1{margin:15px 0 5px;color:#62ecff;font-size:clamp(25px,3vw,48px);text-shadow:3px 3px #092a3c}.screen>p{color:#a7c0cf}
-    .case{font-size:clamp(70px,9vw,140px);filter:drop-shadow(0 0 25px #36e8ff);margin:4px}.reel{max-width:850px;height:160px;margin:15px auto 18px;overflow:hidden;border:5px solid #31566e;background:#07111d;position:relative;box-shadow:0 12px #03090e}.reel:after{content:"";position:absolute;z-index:3;top:0;bottom:0;left:50%;width:5px;background:#ffe141;box-shadow:0 0 14px #ffe141}
-    .track{display:flex;gap:8px;width:max-content;padding:12px;transform:translateX(-70px)}.track.spin{animation:spin 2.7s cubic-bezier(.1,.72,.1,1) forwards}@keyframes spin{to{transform:translateX(-1340px)}}.prize{width:128px;height:128px;flex:none;background:#102235;border:4px solid var(--c);display:grid;place-items:center;box-shadow:inset 0 0 20px #0008}.prize i{font-style:normal;font-size:44px}.prize b,.prize small{display:block}.prize small{font-size:9px;color:var(--c);margin-top:4px}.result{height:37px;font-size:21px}.open{padding:15px 35px;background:linear-gradient(#34ed4b,#11a82a);border:4px solid #064517;box-shadow:inset 0 0 0 3px #72ff80,0 7px #062d10;font-size:20px;font-weight:900}.open:disabled{filter:grayscale(1)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:15px;max-width:900px;margin:35px auto}.item{padding:20px;background:#102235;border:4px solid var(--c);font-size:40px;box-shadow:0 6px #03090f}.item b,.item small{display:block}.item b{font-size:14px;margin-top:8px}.item small{font-size:11px;color:#ffd440;margin-top:6px}.empty{grid-column:1/-1;padding:80px;color:#91aaba}
-    .panel{max-width:720px;margin:60px auto;background:#081927;border:3px solid #42677e;padding:30px;box-shadow:0 12px #03090e}.panel button{display:block;width:100%;padding:16px;margin:12px 0;background:#153449;border:2px solid #52778b;font-weight:900}.panel button:hover{border-color:#5aff66}
-    .toast{position:fixed;z-index:30;left:50%;bottom:25px;transform:translateX(-50%) translateY(120px);background:#071827;border:2px solid #50e65e;padding:13px 22px;font-weight:900;transition:.25s}.toast.show{transform:translateX(-50%) translateY(0)}
-    @media(max-aspect-ratio:4/3){.stage{width:100vw;aspect-ratio:1673/941}.h-chat,.h-feature,.h-daily,.h-top{display:none}.h-play{left:59%;width:39%}.money{display:none}}
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main id="lobby">
-    <div class="stage" aria-label="Лобби BlockCase">
-      <div id="player3d" class="player-3d" aria-label="3D-персонаж — потяните, чтобы вращать"><canvas id="skinCanvas"></canvas></div>
-      <div class="rotate-hint">↔ КРУТИ ПЕРСОНАЖА</div>
-      <span class="money gems" data-gems></span><span class="money coins" data-coins></span>
-      <button class="hotspot h-play-menu" onclick="showCase()" aria-label="Играть">Играть</button>
-      <button class="hotspot h-cases-menu" onclick="showCase()" aria-label="Кейсы">Кейсы</button>
-      <button class="hotspot h-inv-menu" onclick="showInventory()" aria-label="Инвентарь">Инвентарь</button>
-      <button class="hotspot h-shop" onclick="buyCoins()" aria-label="Магазин">Магазин</button>
-      <button class="hotspot h-bonus" onclick="bonus()" aria-label="Бонусы">Бонусы</button>
-      <button class="hotspot h-leaders-menu" onclick="leaders()" aria-label="Лидеры">Лидеры</button>
-      <button class="hotspot h-settings" onclick="settings()" aria-label="Настройки">Настройки</button>
-      <button class="hotspot h-chat" onclick="notify('Чат откроется в следующем обновлении')" aria-label="Открыть чат">Чат</button>
-      <button class="hotspot h-feature" onclick="showCase()" aria-label="Алмазный кейс">Алмазный кейс</button>
-      <button class="hotspot h-daily" onclick="bonus()" aria-label="Ежедневные бонусы">Бонусы</button>
-      <button class="hotspot h-top" onclick="leaders()" aria-label="Топ игроков">Топ игроков</button>
-      <button class="hotspot h-play" onclick="showCase()" aria-label="Играть">Играть</button>
+<main class="game-shell">
+  <aside class="rail" aria-label="Главное меню">
+    <button data-screen="lobby" class="active"><i>⌂</i><span>Играть</span></button>
+    <button data-screen="cases"><i>▣</i><span>Кейсы</span></button>
+    <button data-screen="inventory"><i>⚔</i><span>Инвентарь</span></button>
+    <button data-screen="shop"><i>🏪</i><span>Магазин</span></button>
+    <button data-screen="bonuses"><i>♟</i><span>Бонусы</span></button>
+    <button data-screen="leaders"><i>♛</i><span>Лидеры</span></button>
+    <button data-screen="settings" class="settings"><i>⚙</i><span>Настройки</span></button>
+    <button data-screen="chat" class="chat-fab" aria-label="Чат"><i>☁</i></button>
+  </aside>
+
+  <aside class="left-panel">
+    <div class="profile panel">
+      <div class="avatar">😛</div>
+      <div><strong>Player775587</strong><small>УРОВЕНЬ 12</small><div class="xp"><span></span></div><em>850 / 1500</em></div>
     </div>
-  </main>
+    <div class="mini-wallet panel">
+      <span>🪙 <b data-coins></b></span><button data-buy="coins">+</button>
+      <span>💚 <b data-gems></b></span><button data-buy="gems">+</button>
+    </div>
+    <div class="activity panel">
+      <div class="feed"><i>😍</i><p><b>Player9007</b><span>открыл кейс «Алмазы»</span><small>10 мин назад</small></p></div>
+      <div class="feed"><i>🧙</i><p><b>Player2011</b><span>получил нож «Радуга»</span><small>25 мин назад</small></p></div>
+      <div class="feed"><i>🧟</i><p><b>Player713</b><span>прокачал уровень до 15</span><small>1 ч назад</small></p></div>
+      <div class="feed"><i>🐷</i><p><b>EVA_POKER</b><span>открыла кейс «Золото»</span><small>2 ч назад</small></p></div>
+      <button data-screen="chat">💬 ОТКРЫТЬ ЧАТ</button>
+    </div>
+  </aside>
 
-  <section id="caseScreen" class="screen">
-    <button class="back" onclick="home()">← НАЗАД</button><h1>АЛМАЗНЫЙ КЕЙС</h1><p>Открой кейс и получи одну из редких наград</p><div class="case">💠</div>
-    <div class="reel"><div id="track" class="track"></div></div><div id="result" class="result"></div><button id="openBtn" class="open" onclick="openCase()">ОТКРЫТЬ · 🪙 100</button>
+  <section class="world">
+    <div class="sun"></div><div class="cloud cloud-a"></div><div class="cloud cloud-b"></div>
+    <div class="island island-a"><span></span></div><div class="island island-b"><span></span></div>
+    <div class="tree"><div class="crown"><i></i><i></i><i></i></div><div class="trunk"></div></div>
+    <div class="chest"><div class="lid"></div><div class="chest-lock"></div></div>
+    <div class="torch"><div class="flame"></div><div class="stick"></div></div>
+    <div class="ores"><div></div><div></div><div></div></div>
+    <div class="embers" id="embers"></div><div class="grass-plane"></div>
+
+    <div class="hero" id="hero">
+      <div class="nameplate">Player775587</div>
+      <div class="character-wrap" id="characterDrag" aria-label="Персонаж. Потяните влево или вправо">
+        <div class="character" id="character">
+          <div class="cube head3"><span class="front face"></span><span class="back face"></span><span class="left face"></span><span class="right face"></span><span class="top face"></span></div>
+          <div class="cube torso"><span class="front face"></span><span class="back face"></span><span class="left face"></span><span class="right face"></span></div>
+          <div class="cube arm3 arm-l"><span class="front face"></span><span class="side face"></span></div>
+          <div class="cube arm3 arm-r"><span class="front face"></span><span class="side face"></span></div>
+          <div class="cube leg3 leg-l"><span class="front face"></span><span class="side face"></span></div>
+          <div class="cube leg3 leg-r"><span class="front face"></span><span class="side face"></span></div>
+        </div>
+      </div>
+      <div class="rotate-note">↔ ПОВЕРНИ ИГРОКА</div>
+      <div class="pedestal"><span>🏆 1560</span></div>
+    </div>
+    <div id="screen" class="screen panel" hidden></div>
   </section>
 
-  <section id="inventoryScreen" class="screen">
-    <button class="back" onclick="home()">← НАЗАД</button><h1>ИНВЕНТАРЬ</h1><p>Все добытые предметы хранятся здесь</p><div id="items" class="grid"></div>
-  </section>
-
-  <section id="panelScreen" class="screen"><button class="back" onclick="home()">← НАЗАД</button><div id="panel" class="panel"></div></section>
-  <div id="toast" class="toast"></div>
-  <script src="https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
-  <script>
-    const skinViewer=new skinview3d.SkinViewer({canvas:document.getElementById("skinCanvas"),width:300,height:500,skin:"steve-original.png"});
-    skinViewer.background=null;skinViewer.zoom=.78;skinViewer.fov=50;
-    skinViewer.animation=new skinview3d.IdleAnimation();
-    skinViewer.animation.speed=.6;
-    skinViewer.controls.enableZoom=false;
-    skinViewer.controls.enablePan=false;
-    skinViewer.controls.autoRotate=true;
-    skinViewer.controls.autoRotateSpeed=.7;
-    const playerBox=document.getElementById("player3d");
-    new ResizeObserver(([entry])=>skinViewer.setSize(Math.max(1,Math.round(entry.contentRect.width)),Math.max(1,Math.round(entry.contentRect.height)))).observe(playerBox);
-    const prizes=[["Земля","🟫","#6f9d37",5],["Железо","⛓️","#b9c5cf",18],["Золото","🟨","#f6c945",45],["Алмаз","💎","#43e4ed",120],["Тотем","🗿","#ff8a2a",250]];
-    let coins=Number(localStorage.getItem("bc-coins")||2215),gems=Number(localStorage.getItem("bc-gems")||3000),busy=false,bag=JSON.parse(localStorage.getItem("bc-items")||"[]"),claimed=localStorage.getItem("bc-bonus")==new Date().toDateString();
-    track.innerHTML=Array.from({length:18},(_,i)=>{const p=prizes[i%5];return `<div class="prize" style="--c:${p[2]}"><i>${p[1]}</i><div><b>${p[0]}</b><small>НАГРАДА</small></div></div>`}).join("");
-    function update(){document.querySelectorAll("[data-coins]").forEach(x=>x.textContent=coins);document.querySelectorAll("[data-gems]").forEach(x=>x.textContent=gems);localStorage.setItem("bc-coins",coins);localStorage.setItem("bc-gems",gems)}
-    function home(){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("show"));lobby.style.display="grid";update()}
-    function view(id){lobby.style.display="none";document.querySelectorAll(".screen").forEach(x=>x.classList.remove("show"));document.querySelector(id).classList.add("show")}
-    function showCase(){view("#caseScreen");result.textContent=""}
-    function openCase(){if(busy)return;if(coins<100){notify("Недостаточно монет");return}busy=true;coins-=100;update();openBtn.disabled=true;result.textContent="КРУТИМ...";track.classList.remove("spin");void track.offsetWidth;track.classList.add("spin");setTimeout(()=>{const p=prizes[Math.floor(Math.random()*5)];bag.unshift(p);localStorage.setItem("bc-items",JSON.stringify(bag));result.innerHTML=`ТВОЙ ПРИЗ: <b style="color:${p[2]}">${p[1]} ${p[0]}</b>`;busy=false;openBtn.disabled=false},2700)}
-    function showInventory(){view("#inventoryScreen");items.innerHTML=bag.length?bag.map(p=>`<div class="item" style="--c:${p[2]}">${p[1]}<b>${p[0]}</b><small>🪙 ${p[3]}</small></div>`).join(""):`<div class="empty">Пока пусто. Открой свой первый кейс!</div>`}
-    function buyCoins(){view("#panelScreen");panel.innerHTML=`<h1>МАГАЗИН</h1><p>Тестовый магазин игровой валюты</p><button onclick="coins+=500;update();notify('Получено 500 монет')">🪙 ПОЛУЧИТЬ 500 МОНЕТ</button><button onclick="gems+=100;update();notify('Получено 100 кристаллов')">💎 ПОЛУЧИТЬ 100 КРИСТАЛЛОВ</button>`}
-    function bonus(){if(!claimed){coins+=100;gems+=25;claimed=true;localStorage.setItem("bc-bonus",new Date().toDateString());update();notify("Ежедневный бонус получен!")}else notify("Сегодня бонус уже получен")}
-    function leaders(){view("#panelScreen");panel.innerHTML=`<h1>ТОП ИГРОКИ</h1><button>🥇 Player775587 — 1560</button><button>🥈 AlexCraft — 1420</button><button>🥉 StevePro — 1290</button>`}
-    function settings(){view("#panelScreen");panel.innerHTML=`<h1>НАСТРОЙКИ</h1><button onclick="notify('Звук переключён')">🔊 ЗВУК</button><button onclick="localStorage.clear();location.reload()">🗑 СБРОСИТЬ ПРОГРЕСС</button>`}
-    function notify(text){toast.textContent=text;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2200)}
-    update();
-  </script>
+  <aside class="right-panel">
+    <div class="top-wallet panel">
+      <span>💚 <b data-gems></b></span><button data-buy="gems">+</button>
+      <span>🪙 <b data-coins></b>.00</span><button data-buy="coins">+</button>
+    </div>
+    <button class="featured panel" data-screen="cases"><div class="case-cube">💎</div><div><b>АЛМАЗНЫЙ КЕЙС</b><span>ОТКРОЙ И ПОЛУЧИ<br>ЛУЧШИЕ НАГРАДЫ!</span></div></button>
+    <div class="daily panel"><h3>ЕЖЕДНЕВНЫЕ БОНУСЫ</h3><div id="dailyMini"></div></div>
+    <button class="leaders-card panel" data-screen="leaders"><i>🏆</i><span><b>ТОП ИГРОКИ</b><small>СМОТРИ ЛИДЕРОВ</small></span><em>›</em></button>
+    <button class="play" data-screen="cases">ИГРАТЬ</button>
+  </aside>
+  <div class="toast" id="toast"></div>
+</main>
+<script src="app.js"></script>
 </body>
 </html>
