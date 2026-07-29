@@ -5,7 +5,7 @@
   scene.background=new THREE.Color(0x55c8f5);
   scene.fog=new THREE.Fog(0x8bdbf7,18,38);
   const camera=new THREE.PerspectiveCamera(36,1,.1,100);
-  camera.position.set(8,6.2,16);camera.lookAt(0,1.8,0);
+  camera.position.set(0,5.8,17);camera.lookAt(0,2,0);
   const renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:"high-performance"});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
