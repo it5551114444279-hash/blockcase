@@ -7,7 +7,10 @@
   <style>
     *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06111e;color:#fff;font-family:Arial,sans-serif}button{font:inherit;color:#fff;cursor:pointer}
     #lobby{position:fixed;inset:0;display:grid;place-items:center;background:#06111e}
-    .stage{position:relative;width:min(100vw,calc(100vh * 1.77766));aspect-ratio:1673/941;background:url("lobby.png") center/100% 100% no-repeat;box-shadow:0 0 70px #000}
+    .stage{position:relative;width:min(100vw,calc(100vh * 1.77766));aspect-ratio:1673/941;background:url("lobby-empty.png") center/100% 100% no-repeat;box-shadow:0 0 70px #000}
+    .player-3d{position:absolute;z-index:2;left:39.2%;top:21%;width:20.5%;height:54%;cursor:grab;touch-action:none;filter:drop-shadow(0 16px 9px #08291b80)}
+    .player-3d:active{cursor:grabbing}.player-3d canvas{display:block;width:100%!important;height:100%!important}
+    .rotate-hint{position:absolute;z-index:3;left:42.5%;top:72.7%;width:14%;padding:.45% .4%;border-radius:20px;background:#071521c9;border:1px solid #7a9aae;color:#fff;text-align:center;font-size:clamp(7px,.68vw,12px);font-weight:800;pointer-events:none;opacity:.85}
     .hotspot{position:absolute;border:0;background:transparent;color:transparent;border-radius:3px}
     .hotspot:focus-visible,.hotspot:hover{outline:3px solid #6dff70;outline-offset:-3px;background:#56ff4212}
     .h-play-menu{left:.65%;top:3%;width:8.8%;height:7.7%}.h-cases-menu{left:.65%;top:12%;width:8.8%;height:8.5%}.h-inv-menu{left:.65%;top:21.5%;width:8.8%;height:8.5%}.h-shop{left:.65%;top:31%;width:8.8%;height:8.5%}.h-bonus{left:.65%;top:40.5%;width:8.8%;height:8.5%}.h-leaders-menu{left:.65%;top:50%;width:8.8%;height:8.5%}.h-settings{left:.65%;top:60%;width:8.8%;height:9.5%}.h-chat{left:11.2%;top:79.2%;width:17.7%;height:7%}
@@ -26,6 +29,8 @@
 <body>
   <main id="lobby">
     <div class="stage" aria-label="Лобби BlockCase">
+      <div id="player3d" class="player-3d" aria-label="3D-персонаж — потяните, чтобы вращать"><canvas id="skinCanvas"></canvas></div>
+      <div class="rotate-hint">↔ КРУТИ ПЕРСОНАЖА</div>
       <span class="money gems" data-gems></span><span class="money coins" data-coins></span>
       <button class="hotspot h-play-menu" onclick="showCase()" aria-label="Играть">Играть</button>
       <button class="hotspot h-cases-menu" onclick="showCase()" aria-label="Кейсы">Кейсы</button>
@@ -53,7 +58,18 @@
 
   <section id="panelScreen" class="screen"><button class="back" onclick="home()">← НАЗАД</button><div id="panel" class="panel"></div></section>
   <div id="toast" class="toast"></div>
+  <script src="https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
   <script>
+    const skinViewer=new skinview3d.SkinViewer({canvas:document.getElementById("skinCanvas"),width:300,height:500,skin:"steve-original.png"});
+    skinViewer.background=null;skinViewer.zoom=.78;skinViewer.fov=50;
+    skinViewer.animation=new skinview3d.IdleAnimation();
+    skinViewer.animation.speed=.6;
+    skinViewer.controls.enableZoom=false;
+    skinViewer.controls.enablePan=false;
+    skinViewer.controls.autoRotate=true;
+    skinViewer.controls.autoRotateSpeed=.7;
+    const playerBox=document.getElementById("player3d");
+    new ResizeObserver(([entry])=>skinViewer.setSize(Math.max(1,Math.round(entry.contentRect.width)),Math.max(1,Math.round(entry.contentRect.height)))).observe(playerBox);
     const prizes=[["Земля","🟫","#6f9d37",5],["Железо","⛓️","#b9c5cf",18],["Золото","🟨","#f6c945",45],["Алмаз","💎","#43e4ed",120],["Тотем","🗿","#ff8a2a",250]];
     let coins=Number(localStorage.getItem("bc-coins")||2215),gems=Number(localStorage.getItem("bc-gems")||3000),busy=false,bag=JSON.parse(localStorage.getItem("bc-items")||"[]"),claimed=localStorage.getItem("bc-bonus")==new Date().toDateString();
     track.innerHTML=Array.from({length:18},(_,i)=>{const p=prizes[i%5];return `<div class="prize" style="--c:${p[2]}"><i>${p[1]}</i><div><b>${p[0]}</b><small>НАГРАДА</small></div></div>`}).join("");
